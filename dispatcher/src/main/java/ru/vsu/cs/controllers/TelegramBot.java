@@ -1,41 +1,44 @@
-package ru.vsu.cs.controller;
+package ru.vsu.cs.controllers;
 
 import lombok.extern.log4j.Log4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.vsu.cs.config.BotConfig;
+
+import javax.annotation.PostConstruct;
 
 @Component
 @Log4j
 public class TelegramBot extends TelegramLongPollingBot {
-    @Value("${bot.name}")
-    private String botName;
-    @Value("${bot.token}")
-    private String botToken;
+    private final BotConfig botConfig;
+    private UpdateController updateController;
+
+    public TelegramBot(BotConfig botConfig, UpdateController updateController) {
+        this.botConfig = botConfig;
+        this.updateController = updateController;
+    }
+
+    @PostConstruct
+    public void init() {
+        updateController.registerBot(this);
+    }
 
     @Override
     public String getBotUsername() {
-        return botName;
+        return botConfig.getBotName();
     }
 
     @Override
     public String getBotToken() {
-        return botToken;
+        return botConfig.getBotToken();
     }
 
     @Override
     public void onUpdateReceived(Update update) {
-        var recievedMessage = update.getMessage();
-        log.debug(recievedMessage.getText());
-
-        var response = new SendMessage();
-        response.setChatId(recievedMessage.getChatId().toString());
-        response.setText("Hello from bot!");
-        sendAnswerMessage(response);
+        updateController.processUpdate(update);
     }
 
     public void sendAnswerMessage(SendMessage message) {
