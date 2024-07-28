@@ -1,6 +1,5 @@
 2024-07-27 16:47:46 DEBUG TelegramBot:30 - hi
 2024-07-27 16:50:51 DEBUG TelegramBot:30 - why not?
-2024-07-27 16:54:50 DEBUG TelegramBot:33 - авыа
 2024-07-27 16:54:50 ERROR TelegramBot:46 - org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException: Unable to deserialize response
 2024-07-27 16:55:45 DEBUG TelegramBot:33 - hello!
 2024-07-27 16:55:45 ERROR TelegramBot:46 - org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException: Unable to deserialize response
@@ -15,3 +14,5 @@
 2024-07-27 20:07:28 DEBUG UpdateProducerImpl:13 - 
 2024-07-27 20:09:11 DEBUG UpdateProducerImpl:13 - 
 2024-07-27 20:09:30 DEBUG UpdateProducerImpl:13 - 
+2024-07-28 16:41:55 DEBUG UpdateProducerImpl:20 - hello 1
+2024-07-28 16:42:26 DEBUG UpdateProducerImpl:20 - chef
