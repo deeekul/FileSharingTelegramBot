@@ -10,6 +10,7 @@ import ru.vsu.cs.config.BotConfig;
 
 import javax.annotation.PostConstruct;
 
+/** Class responsible for interacting with the telegram server */
 @Component
 @Log4j
 public class TelegramBot extends TelegramLongPollingBot {

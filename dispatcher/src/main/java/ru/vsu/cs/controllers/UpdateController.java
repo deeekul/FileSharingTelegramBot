@@ -9,6 +9,9 @@ import ru.vsu.cs.utils.MessageUtils;
 
 import static ru.vsu.cs.model.RabbitQueue.*;
 
+/**
+ * Class for distributing user messages
+ */
 @Component
 @Log4j
 public class UpdateController {
@@ -29,7 +32,7 @@ public class UpdateController {
         if (update == null) {
             log.error("Recieved update is null!");
         }
-        if (update.getMessage() != null) {
+        if (update.hasMessage()) {
             distributeMessageByType(update);
         } else {
             log.error("Unsupported message type is recieved: " + update);
@@ -38,11 +41,11 @@ public class UpdateController {
 
     private void distributeMessageByType(Update update) {
         var message = update.getMessage();
-        if (message.getText() != null) {
+        if (message.hasText()) {
             processTextMessage(update);
-        } else if (message.getDocument() != null) {
+        } else if (message.hasDocument()) {
             processDocMessage(update);
-        } else if (message.getPhoto() != null) {
+        } else if (message.hasPhoto()) {
             processPhotoMessage(update);
         } else {
             setUnsupportedMessageTypeView(update);

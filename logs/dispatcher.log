@@ -19,3 +19,8 @@
 2024-07-28 16:53:03 DEBUG UpdateProducerImpl:20 - hello 2
 2024-07-28 17:37:30 DEBUG UpdateProducerImpl:20 - Hello from chat!
 
+2024-08-30 22:40:50 DEBUG UpdateProducerImpl:20 - txt
+2024-08-30 22:41:05 DEBUG UpdateProducerImpl:20 - hello
+2024-08-30 23:28:30 DEBUG UpdateProducerImpl:20 - 
+2024-08-31 16:51:51 DEBUG UpdateProducerImpl:20 - hello
+2024-09-02 00:45:48 DEBUG UpdateProducerImpl:20 - hello from user
