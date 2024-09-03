@@ -3,5 +3,7 @@ package ru.vsu.cs.services;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 public interface MainService {
-    void processTextMessages(Update update);
+    void processTextMessage(Update update);
+    void processDocMessage(Update update);
+    void processPhotoMessage(Update update);
 }

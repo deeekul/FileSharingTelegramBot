@@ -12,3 +12,4 @@
 2024-08-30 23:28:30 DEBUG ConsumerServiceImpl:43 - NODE: Photo message is recieved!
 2024-08-31 16:51:51 DEBUG ConsumerServiceImpl:26 - NODE: Text message is recieved!
 2024-09-02 00:45:48 DEBUG ConsumerServiceImpl:26 - NODE: Text message is recieved!
+2024-09-02 00:56:32 DEBUG ConsumerServiceImpl:26 - NODE: Text message is recieved!

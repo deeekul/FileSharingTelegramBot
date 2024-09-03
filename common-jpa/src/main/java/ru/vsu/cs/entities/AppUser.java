@@ -28,5 +28,5 @@ public class AppUser {
     private String email;
     private boolean isActive;
     @Enumerated(EnumType.STRING)
-    private UserState userState;
+    private UserState state;
 }
