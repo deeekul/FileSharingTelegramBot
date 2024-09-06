@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import ru.vsu.cs.entities.AppDocument;
+import ru.vsu.cs.entities.AppPhoto;
 import ru.vsu.cs.entities.AppUser;
 import ru.vsu.cs.entities.RawData;
 import ru.vsu.cs.exceptions.UploadFileException;
@@ -50,7 +51,7 @@ public class MainServiceImpl implements MainService {
         var answerMsg = "";
 
         var serviceCommand = ServiceCommand.fromValue(text);
-        if (CANCEL.equals(text)) {
+        if (CANCEL.equals(serviceCommand)) {
             answerMsg = cancelProcess(appUser);
         } else if (BASIC_STATE.equals(userState)) {
             answerMsg = processServiceCommands(appUser, text);
@@ -75,12 +76,13 @@ public class MainServiceImpl implements MainService {
         }
 
         try {
-            AppDocument appDoc = fileService.processDoc(update.getMessage());
-            // TODO добавить генерацию ссылки для скачивания документа
-            var answerMessage = "Документ успешно загружен! Ссылка для скачивания: http://test.ru/get-doc/777";
+            AppDocument document = fileService.processDoc(update.getMessage());
+            //TODO Добавить генерацию ссылки для скачивания документа
+            var answerMessage = "Документ успешно загружен! "
+                    + "Ссылка для скачивания: http://test.ru/get-doc/777";
             sendAnswer(answerMessage, chatId);
-        } catch (UploadFileException exception) {
-            log.error(exception);
+        } catch (UploadFileException ex) {
+            log.error(ex);
             String errorMessage = "К сожалению, загрузка файла не удалась. Повторите попытку позже.";
             sendAnswer(errorMessage, chatId);
         }
@@ -95,9 +97,18 @@ public class MainServiceImpl implements MainService {
             return;
         }
 
-        // TODO Добавить сохранение фото
-        var answerMessage = "Фото успешно загружено! Ссылка для скачивания: http://test.ru/get-photo/777";
-        sendAnswer(answerMessage, chatId);
+        try {
+            AppPhoto photo = fileService.processPhoto(update.getMessage());
+            // TODO Добавить генерацию ссылки для скачивания фото
+            var answerMessage = "Фото успешно загружено! "
+                    + "Ссылка для скачивания: http://test.ru/get-doc/777";
+            sendAnswer(answerMessage, chatId);
+        } catch (UploadFileException ex) {
+            log.error(ex);
+            String errorMessage = "К сожалению, загрузка фото не удалась. Повторите попытку позже.";
+            sendAnswer(errorMessage, chatId);
+
+        }
     }
 
     private boolean isNotAllowedToSendContent(Long chatId, AppUser appUser) {
