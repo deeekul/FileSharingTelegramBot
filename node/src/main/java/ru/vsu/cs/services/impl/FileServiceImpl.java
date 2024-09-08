@@ -17,6 +17,8 @@ import ru.vsu.cs.repositories.AppDocumentRepository;
 import ru.vsu.cs.repositories.AppPhotoRepository;
 import ru.vsu.cs.repositories.BinaryContentRepository;
 import ru.vsu.cs.services.FileService;
+import ru.vsu.cs.services.enums.LinkType;
+import ru.vsu.cs.utils.CryptoTool;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,14 +41,19 @@ public class FileServiceImpl implements FileService {
     /** The address where you can download the content */
     @Value("${service.file_storage.uri}")
     private String fileStorageUri;
+
+    @Value("${link.address}")
+    private String linkAddress;
     private final AppDocumentRepository appDocumentRepository;
     private final AppPhotoRepository appPhotoRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final CryptoTool cryptoTool;
 
-    public FileServiceImpl(AppDocumentRepository appDocumentRepository, AppPhotoRepository appPhotoRepository, BinaryContentRepository binaryContentRepository) {
+    public FileServiceImpl(AppDocumentRepository appDocumentRepository, AppPhotoRepository appPhotoRepository, BinaryContentRepository binaryContentRepository, CryptoTool cryptoTool) {
         this.appDocumentRepository = appDocumentRepository;
         this.appPhotoRepository = appPhotoRepository;
         this.binaryContentRepository = binaryContentRepository;
+        this.cryptoTool = cryptoTool;
     }
 
     @Override
@@ -65,8 +72,9 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public AppPhoto processPhoto(Message telegramMessage) {
-        // TODO сделать обработку нескольких фото
-        PhotoSize telegramPhoto = telegramMessage.getPhoto().get(0);
+        var photoSizeCount = telegramMessage.getPhoto().size();
+        var photoIndex = photoSizeCount > 1 ? telegramMessage.getPhoto().size() - 1 : 0;
+        PhotoSize telegramPhoto = telegramMessage.getPhoto().get(photoIndex);
         String fileId = telegramPhoto.getFileId();
         ResponseEntity<String> response = getFilePath(fileId);
         if (response.getStatusCode() == HttpStatus.OK) {
@@ -140,5 +148,11 @@ public class FileServiceImpl implements FileService {
         } catch (IOException e) {
             throw new UploadFileException(urlObj.toExternalForm(), e);
         }
+    }
+
+    @Override
+    public String generateLink(Long docId, LinkType linkType) {
+        var hash = cryptoTool.hashOf(docId);
+        return "http://" + linkAddress + "/" + linkType + "?id=" + hash;
     }
 }

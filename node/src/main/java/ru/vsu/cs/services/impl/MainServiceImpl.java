@@ -15,6 +15,7 @@ import ru.vsu.cs.repositories.RawDataRepository;
 import ru.vsu.cs.services.FileService;
 import ru.vsu.cs.services.MainService;
 import ru.vsu.cs.services.ProducerService;
+import ru.vsu.cs.services.enums.LinkType;
 import ru.vsu.cs.services.enums.ServiceCommand;
 
 import java.util.Optional;
@@ -77,9 +78,9 @@ public class MainServiceImpl implements MainService {
 
         try {
             AppDocument document = fileService.processDoc(update.getMessage());
-            //TODO Добавить генерацию ссылки для скачивания документа
+            String link = fileService.generateLink(document.getId(), LinkType.GET_DOC);
             var answerMessage = "Документ успешно загружен! "
-                    + "Ссылка для скачивания: http://test.ru/get-doc/777";
+                    + "Ссылка для скачивания: " + link;
             sendAnswer(answerMessage, chatId);
         } catch (UploadFileException ex) {
             log.error(ex);
@@ -99,9 +100,9 @@ public class MainServiceImpl implements MainService {
 
         try {
             AppPhoto photo = fileService.processPhoto(update.getMessage());
-            // TODO Добавить генерацию ссылки для скачивания фото
-            var answerMessage = "Фото успешно загружено! "
-                    + "Ссылка для скачивания: http://test.ru/get-doc/777";
+            String link = fileService.generateLink(photo.getId(), LinkType.GET_PHOTO);
+            var answerMessage = "Документ успешно загружен! "
+                    + "Ссылка для скачивания: " + link;
             sendAnswer(answerMessage, chatId);
         } catch (UploadFileException ex) {
             log.error(ex);
