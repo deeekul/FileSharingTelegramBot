@@ -107,7 +107,6 @@ public class MainServiceImpl implements MainService {
             log.error(ex);
             String errorMessage = "К сожалению, загрузка фото не удалась. Повторите попытку позже.";
             sendAnswer(errorMessage, chatId);
-
         }
     }
 
