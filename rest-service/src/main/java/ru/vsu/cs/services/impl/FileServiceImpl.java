@@ -10,6 +10,7 @@ import ru.vsu.cs.entities.BinaryContent;
 import ru.vsu.cs.repositories.AppDocumentRepository;
 import ru.vsu.cs.repositories.AppPhotoRepository;
 import ru.vsu.cs.services.FileService;
+import ru.vsu.cs.utils.CryptoTool;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,23 +20,23 @@ import java.io.IOException;
 public class FileServiceImpl implements FileService {
     private final AppDocumentRepository appDocumentRepository;
     private final AppPhotoRepository appPhotoRepository;
+    private final CryptoTool cryptoTool;
 
-    public FileServiceImpl(AppDocumentRepository appDocumentRepository, AppPhotoRepository appPhotoRepository) {
+    public FileServiceImpl(AppDocumentRepository appDocumentRepository, AppPhotoRepository appPhotoRepository, CryptoTool cryptoTool) {
         this.appDocumentRepository = appDocumentRepository;
         this.appPhotoRepository = appPhotoRepository;
+        this.cryptoTool = cryptoTool;
     }
 
     @Override
     public AppDocument getDocument(String docId) {
-        // TODO добавить дешифрование хеш-строки
-        var id = Long.parseLong(docId);
+        var id = cryptoTool.idOf(docId);
         return appDocumentRepository.findById(id).orElse(null);
     }
 
     @Override
     public AppPhoto getPhoto(String photoId) {
-        // TODO добавить дешифрование хеш-строки
-        var id = Long.parseLong(photoId);
+        var id = cryptoTool.idOf(photoId);
         return appPhotoRepository.findById(id).orElse(null);
     }
 
