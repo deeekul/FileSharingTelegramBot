@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * The module is responsible for downloading files from the database via the link
+ * The module is responsible for downloading files from the database via a link and activating the user account
  */
 @SpringBootApplication
 public class RestService {
