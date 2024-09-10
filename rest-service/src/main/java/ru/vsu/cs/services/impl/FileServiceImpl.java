@@ -40,10 +40,11 @@ public class FileServiceImpl implements FileService {
         return appPhotoRepository.findById(id).orElse(null);
     }
 
+    /** To convert an array of bytes from the database into an object of the FileSystemResource class,
+     * which can be sent in the response body to the user */
     @Override
     public FileSystemResource getFileSystemResource(BinaryContent binaryContent) {
         try {
-            // TODO добавить генерацию имени временного файла
             File temp = File.createTempFile("tempFile", ".bin");
             temp.deleteOnExit();
             FileUtils.writeByteArrayToFile(temp, binaryContent.getFileAsArrayOfBytes());

@@ -12,6 +12,7 @@ import ru.vsu.cs.entities.RawData;
 import ru.vsu.cs.exceptions.UploadFileException;
 import ru.vsu.cs.repositories.AppUserRepository;
 import ru.vsu.cs.repositories.RawDataRepository;
+import ru.vsu.cs.services.AppUserService;
 import ru.vsu.cs.services.FileService;
 import ru.vsu.cs.services.MainService;
 import ru.vsu.cs.services.ProducerService;
@@ -34,13 +35,15 @@ public class MainServiceImpl implements MainService {
     private final AppUserRepository appUserRepository;
     private final ProducerService producerService;
     private final FileService fileService;
+    private final AppUserService appUserService;
 
     public MainServiceImpl(RawDataRepository rawDataRepository, ProducerService producerService,
-                           AppUserRepository appUserRepository, FileService fileService) {
+                           AppUserRepository appUserRepository, FileService fileService, AppUserService appUserService) {
         this.rawDataRepository = rawDataRepository;
         this.producerService = producerService;
         this.appUserRepository = appUserRepository;
         this.fileService = fileService;
+        this.appUserService = appUserService;
     }
 
     @Override
@@ -57,7 +60,7 @@ public class MainServiceImpl implements MainService {
         } else if (BASIC_STATE.equals(userState)) {
             answerMsg = processServiceCommands(appUser, text);
         } else if (WAIT_FOR_EMAIL_STATE.equals(userState)) {
-            // TODO добавить обработку email
+            answerMsg = appUserService.setEmail(appUser, text);
         } else {
             log.debug("Неизвестное состояние пользователя: " + userState);
             answerMsg = "Неизвестная ошибка! Введите /cancel и повторите попытку!";
@@ -136,8 +139,7 @@ public class MainServiceImpl implements MainService {
     private String processServiceCommands(AppUser appUser, String cmd) {
         var serviceCommand = ServiceCommand.fromValue(cmd);
         if (REGISTRATION.equals(serviceCommand)) {
-            // TODO добавить регистрацию
-            return "Временно недоступно!";
+            return appUserService.registerUser(appUser);
         } else if (HELP.equals(serviceCommand)) {
             return help();
         } else if (START.equals(serviceCommand)) {
@@ -153,10 +155,6 @@ public class MainServiceImpl implements MainService {
                 + "/registration - регистрация пользователя.\n";
     }
 
-    private void registrationProcess(AppUser appUser) {
-
-    }
-
     private String cancelProcess(AppUser appUser) {
         appUser.setState(BASIC_STATE);
         appUserRepository.save(appUser);
@@ -165,14 +163,14 @@ public class MainServiceImpl implements MainService {
 
     private AppUser findOrSaveAppUser(Update update) {
         User telegramUser = update.getMessage().getFrom();
-        Optional<AppUser> persistentAppUser = appUserRepository.findAppUserByTelegramUserId(telegramUser.getId());
-        if (!persistentAppUser.isPresent()) {
+        Optional<AppUser> persistentAppUser = appUserRepository.findByTelegramUserId(telegramUser.getId());
+        if (persistentAppUser.isEmpty()) {
             AppUser transientAppUser = AppUser.builder()
                                 .telegramUserId(telegramUser.getId())
                                 .userName(telegramUser.getUserName())
                                 .firstName(telegramUser.getFirstName())
                                 .lastName(telegramUser.getLastName())
-                                .isActive(true) // TODO поменять значение по умолчанию после регистрации
+                                .isActive(false)
                                 .state(BASIC_STATE)
                                 .build();
             return appUserRepository.save(transientAppUser);
