@@ -1,4 +1,4 @@
-package ru.vsu.cs.configuration;
+package ru.vsu.cs.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -7,6 +7,7 @@ import ru.vsu.cs.utils.CryptoTool;
 
 @Configuration
 public class RestServiceConfiguration {
+
     @Value("${salt}")
     private String salt;
 

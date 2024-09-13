@@ -1,10 +1,10 @@
 package ru.vsu.cs.services.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
 import ru.vsu.cs.entities.AppDocument;
 import ru.vsu.cs.entities.AppPhoto;
 import ru.vsu.cs.entities.AppUser;
@@ -19,8 +19,6 @@ import ru.vsu.cs.services.ProducerService;
 import ru.vsu.cs.services.enums.LinkType;
 import ru.vsu.cs.services.enums.ServiceCommand;
 
-import java.util.Optional;
-
 import static ru.vsu.cs.enums.UserState.BASIC_STATE;
 import static ru.vsu.cs.enums.UserState.WAIT_FOR_EMAIL_STATE;
 import static ru.vsu.cs.services.enums.ServiceCommand.*;
@@ -29,22 +27,19 @@ import static ru.vsu.cs.services.enums.ServiceCommand.*;
  * The service through which incoming messages will be processed
  */
 @Service
+@RequiredArgsConstructor
 @Log4j
 public class MainServiceImpl implements MainService {
-    private final RawDataRepository rawDataRepository;
-    private final AppUserRepository appUserRepository;
-    private final ProducerService producerService;
-    private final FileService fileService;
-    private final AppUserService appUserService;
 
-    public MainServiceImpl(RawDataRepository rawDataRepository, ProducerService producerService,
-                           AppUserRepository appUserRepository, FileService fileService, AppUserService appUserService) {
-        this.rawDataRepository = rawDataRepository;
-        this.producerService = producerService;
-        this.appUserRepository = appUserRepository;
-        this.fileService = fileService;
-        this.appUserService = appUserService;
-    }
+    private final RawDataRepository rawDataRepository;
+
+    private final AppUserRepository appUserRepository;
+
+    private final ProducerService producerService;
+
+    private final FileService fileService;
+
+    private final AppUserService appUserService;
 
     @Override
     public void processTextMessage(Update update) {
@@ -162,26 +157,26 @@ public class MainServiceImpl implements MainService {
     }
 
     private AppUser findOrSaveAppUser(Update update) {
-        User telegramUser = update.getMessage().getFrom();
-        Optional<AppUser> persistentAppUser = appUserRepository.findByTelegramUserId(telegramUser.getId());
-        if (persistentAppUser.isEmpty()) {
+        var telegramUser = update.getMessage().getFrom();
+        var appUserOpt = appUserRepository.findByTelegramUserId(telegramUser.getId());
+        if (appUserOpt.isEmpty()) {
             AppUser transientAppUser = AppUser.builder()
-                                .telegramUserId(telegramUser.getId())
-                                .userName(telegramUser.getUserName())
-                                .firstName(telegramUser.getFirstName())
-                                .lastName(telegramUser.getLastName())
-                                .isActive(false)
-                                .state(BASIC_STATE)
-                                .build();
+                    .telegramUserId(telegramUser.getId())
+                    .userName(telegramUser.getUserName())
+                    .firstName(telegramUser.getFirstName())
+                    .lastName(telegramUser.getLastName())
+                    .isActive(false)
+                    .state(BASIC_STATE)
+                    .build();
             return appUserRepository.save(transientAppUser);
         }
-        return persistentAppUser.get();
+        return appUserOpt.get();
     }
 
     private void saveRawData(Update update) {
         RawData rawData = RawData.builder()
-                        .event(update)
-                        .build();
+                .event(update)
+                .build();
         rawDataRepository.save(rawData);
     }
 }

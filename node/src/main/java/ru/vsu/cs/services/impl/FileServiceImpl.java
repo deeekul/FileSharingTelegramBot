@@ -1,5 +1,6 @@
 package ru.vsu.cs.services.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,8 +30,10 @@ import java.net.URL;
  * The service receives a telegram message, performs all necessary actions to download the file and saves it to the database
  */
 @Log4j
+@RequiredArgsConstructor
 @Service
 public class FileServiceImpl implements FileService {
+
     @Value("${token}")
     private String token;
 
@@ -44,27 +47,23 @@ public class FileServiceImpl implements FileService {
 
     @Value("${link.address}")
     private String linkAddress;
-    private final AppDocumentRepository appDocumentRepository;
-    private final AppPhotoRepository appPhotoRepository;
-    private final BinaryContentRepository binaryContentRepository;
-    private final CryptoTool cryptoTool;
 
-    public FileServiceImpl(AppDocumentRepository appDocumentRepository, AppPhotoRepository appPhotoRepository,
-                           BinaryContentRepository binaryContentRepository, CryptoTool cryptoTool) {
-        this.appDocumentRepository = appDocumentRepository;
-        this.appPhotoRepository = appPhotoRepository;
-        this.binaryContentRepository = binaryContentRepository;
-        this.cryptoTool = cryptoTool;
-    }
+    private final AppDocumentRepository appDocumentRepository;
+
+    private final AppPhotoRepository appPhotoRepository;
+
+    private final BinaryContentRepository binaryContentRepository;
+
+    private final CryptoTool cryptoTool;
 
     @Override
     public AppDocument processDoc(Message telegramMessage) {
-        Document telegramDoc = telegramMessage.getDocument();
-        String fileId = telegramDoc.getFileId();
-        ResponseEntity<String> response = getFilePath(fileId);
+        var telegramDoc = telegramMessage.getDocument();
+        var fileId = telegramDoc.getFileId();
+        var response = getFilePath(fileId);
         if (response.getStatusCode() == HttpStatus.OK) {
-            BinaryContent persistentBinaryContent = getPersistentBinaryContent(response);
-            AppDocument transientAppDoc = buildTransientAppDoc(telegramDoc, persistentBinaryContent);
+            var persistentBinaryContent = getPersistentBinaryContent(response);
+            var transientAppDoc = buildTransientAppDoc(telegramDoc, persistentBinaryContent);
             return appDocumentRepository.save(transientAppDoc);
         } else {
             throw new UploadFileException("Bad response for telegram service:" + response);
@@ -75,16 +74,32 @@ public class FileServiceImpl implements FileService {
     public AppPhoto processPhoto(Message telegramMessage) {
         var photoSizeCount = telegramMessage.getPhoto().size();
         var photoIndex = photoSizeCount > 1 ? telegramMessage.getPhoto().size() - 1 : 0;
-        PhotoSize telegramPhoto = telegramMessage.getPhoto().get(photoIndex);
-        String fileId = telegramPhoto.getFileId();
-        ResponseEntity<String> response = getFilePath(fileId);
+        var telegramPhoto = telegramMessage.getPhoto().get(photoIndex);
+        var fileId = telegramPhoto.getFileId();
+        var response = getFilePath(fileId);
         if (response.getStatusCode() == HttpStatus.OK) {
-            BinaryContent persistentBinaryContent = getPersistentBinaryContent(response);
-            AppPhoto transientAppPhoto = buildTransientAppPhoto(telegramPhoto, persistentBinaryContent);
+            var persistentBinaryContent = getPersistentBinaryContent(response);
+            var transientAppPhoto = buildTransientAppPhoto(telegramPhoto, persistentBinaryContent);
             return appPhotoRepository.save(transientAppPhoto);
         } else {
             throw new UploadFileException("Bad response for telegram service:" + response);
         }
+    }
+
+    private BinaryContent getPersistentBinaryContent(ResponseEntity<String> response) {
+        var filePath = getFilePath(response);
+        var fileInByte = downloadFile(filePath);
+        var transientBinaryContent = BinaryContent.builder()
+                .fileAsArrayOfBytes(fileInByte)
+                .build();
+        return binaryContentRepository.save(transientBinaryContent);
+    }
+
+    private static String getFilePath(ResponseEntity<String> response) {
+        var jsonObject = new JSONObject(response.getBody());
+        return String.valueOf(jsonObject
+                .getJSONObject("result")
+                .getString("file_path"));
     }
 
     private AppDocument buildTransientAppDoc(Document telegramDoc, BinaryContent persistentBinaryContent) {
@@ -105,26 +120,10 @@ public class FileServiceImpl implements FileService {
                 .build();
     }
 
-    private BinaryContent getPersistentBinaryContent(ResponseEntity<String> response) {
-        String filePath = getFilePath(response);
-        byte[] fileInByte = downloadFile(filePath);
-        BinaryContent transientBinaryContent = BinaryContent.builder()
-                .fileAsArrayOfBytes(fileInByte)
-                .build();
-        return binaryContentRepository.save(transientBinaryContent);
-    }
-
-    private static String getFilePath(ResponseEntity<String> response) {
-        JSONObject jsonObject = new JSONObject(response.getBody());
-        return String.valueOf(jsonObject
-                .getJSONObject("result")
-                .getString("file_path"));
-    }
-
     private ResponseEntity<String> getFilePath(String fileId) {
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity<String> request = new HttpEntity<>(headers);
+        var restTemplate = new RestTemplate();
+        var headers = new HttpHeaders();
+        var request = new HttpEntity<>(headers);
 
         return restTemplate.exchange(
                 fileInfoUri,
@@ -136,7 +135,7 @@ public class FileServiceImpl implements FileService {
     }
 
     private byte[] downloadFile(String filePath) {
-        String fullUri = fileStorageUri.replace("{token}", token).replace("{filePath}", filePath);
+        var fullUri = fileStorageUri.replace("{token}", token).replace("{filePath}", filePath);
         URL urlObj = null;
         try {
             urlObj = new URL(fullUri);

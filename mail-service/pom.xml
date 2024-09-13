@@ -8,13 +8,13 @@
     </parent>
 
     <artifactId>mail-service</artifactId>
-    <packaging>jar</packaging>
 
     <name>mail-service</name>
     <url>http://maven.apache.org</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <common-utils.version>1.0-SNAPSHOT</common-utils.version>
     </properties>
 
     <dependencies>
@@ -30,10 +30,14 @@
         </dependency>
 
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>ru.vsu.cs</groupId>
             <artifactId>common-utils</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
+            <version>${common-utils.version}</version>
         </dependency>
 
         <dependency>
