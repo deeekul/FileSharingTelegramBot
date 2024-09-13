@@ -6,6 +6,7 @@ import org.hashids.Hashids;
  * Utility for encrypting and decrypting the id in the link
  */
 public class CryptoTool {
+
     private final Hashids hashids;
 
     public CryptoTool(String salt) {

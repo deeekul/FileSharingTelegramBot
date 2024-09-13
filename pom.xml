@@ -11,12 +11,11 @@
   <url>http://maven.apache.org</url>
   <modules>
     <module>dispatcher</module>
-    <module>common-rabbitmq</module>
     <module>node</module>
     <module>common-jpa</module>
     <module>rest-service</module>
-      <module>common-utils</module>
-      <module>mail-service</module>
+    <module>common-utils</module>
+    <module>mail-service</module>
   </modules>
 
   <properties>

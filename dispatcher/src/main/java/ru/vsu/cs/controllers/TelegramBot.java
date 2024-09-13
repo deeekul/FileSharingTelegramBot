@@ -1,5 +1,6 @@
 package ru.vsu.cs.controllers;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
@@ -15,16 +16,14 @@ import javax.annotation.PostConstruct;
 /**
  * Class responsible for interacting with the telegram server
  */
-@Component
 @Log4j
+@RequiredArgsConstructor
+@Component
 public class TelegramBot extends TelegramWebhookBot {
-    private final BotConfig botConfig;
-    private final UpdateProcessor updateProcessor;
 
-    public TelegramBot(BotConfig botConfig, UpdateProcessor updateProcessor) {
-        this.botConfig = botConfig;
-        this.updateProcessor = updateProcessor;
-    }
+    private final BotConfig botConfig;
+
+    private final UpdateProcessor updateProcessor;
 
     @PostConstruct
     public void init() {

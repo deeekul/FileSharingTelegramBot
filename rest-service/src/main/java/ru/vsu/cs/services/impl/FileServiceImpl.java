@@ -1,5 +1,6 @@
 package ru.vsu.cs.services.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
 import ru.vsu.cs.entities.AppDocument;
@@ -10,17 +11,15 @@ import ru.vsu.cs.services.FileService;
 import ru.vsu.cs.utils.CryptoTool;
 
 @Log4j
+@RequiredArgsConstructor
 @Service
 public class FileServiceImpl implements FileService {
-    private final AppDocumentRepository appDocumentRepository;
-    private final AppPhotoRepository appPhotoRepository;
-    private final CryptoTool cryptoTool;
 
-    public FileServiceImpl(AppDocumentRepository appDocumentRepository, AppPhotoRepository appPhotoRepository, CryptoTool cryptoTool) {
-        this.appDocumentRepository = appDocumentRepository;
-        this.appPhotoRepository = appPhotoRepository;
-        this.cryptoTool = cryptoTool;
-    }
+    private final AppDocumentRepository appDocumentRepository;
+
+    private final AppPhotoRepository appPhotoRepository;
+
+    private final CryptoTool cryptoTool;
 
     @Override
     public AppDocument getDocument(String docId) {

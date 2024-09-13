@@ -1,10 +1,10 @@
 package ru.vsu.cs.services.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import ru.vsu.cs.dto.MailParams;
 import ru.vsu.cs.entities.AppUser;
 import ru.vsu.cs.repositories.AppUserRepository;
@@ -18,17 +18,18 @@ import static ru.vsu.cs.enums.UserState.BASIC_STATE;
 import static ru.vsu.cs.enums.UserState.WAIT_FOR_EMAIL_STATE;
 
 @Log4j
+@RequiredArgsConstructor
 @Service
 public class AppUserServiceImpl implements AppUserService {
-    private final AppUserRepository appUserRepository;
-    private final CryptoTool cryptoTool;
-    @Value("${service.mail.uri}")
-    private String mailServiceUri;
 
-    public AppUserServiceImpl(AppUserRepository appUserRepository, CryptoTool cryptoTool) {
-        this.appUserRepository = appUserRepository;
-        this.cryptoTool = cryptoTool;
-    }
+    private final AppUserRepository appUserRepository;
+
+    private final CryptoTool cryptoTool;
+
+    private final RabbitTemplate rabbitTemplate;
+
+    @Value("${spring.rabbitmq.queues.registration-mail}")
+    private String registrationMailQueue;
 
     @Override
     public String registerUser(AppUser appUser) {
@@ -46,27 +47,21 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     public String setEmail(AppUser appUser, String email) {
         try {
-            InternetAddress emailAddress = new InternetAddress(email);
+            var emailAddress = new InternetAddress(email);
             emailAddress.validate();
         } catch (AddressException e) {
             return "Пожалуйста, введите корректный email. Для отмена команды нажмите /cancel";
         }
-        var foundUser = appUserRepository.findByEmail(email);
-        if (foundUser.isEmpty()) {
+        var appUserOpt = appUserRepository.findByEmail(email);
+        if (appUserOpt.isEmpty()) {
             appUser.setEmail(email);
             appUser.setState(BASIC_STATE);
-            appUserRepository.save(appUser);
+            appUser = appUserRepository.save(appUser);
 
             var cryptoUserId = cryptoTool.hashOf(appUser.getId());
-            var response = sendRequestToMailService(cryptoUserId, email);
-            if (response.getStatusCode() != HttpStatus.OK) {
-                var message = String.format("Отправка электронного письма на почту %s не удалась", email);
-                log.error(message);
-                appUser.setEmail(null);
-                appUserRepository.save(appUser);
-                return message;
-            }
-            return "Вам на почту было отправлено письмо. "
+            sendRegistrationMail(cryptoUserId, email);
+
+            return "Вам на почту было отправлено письмо."
                     + "Перейдите по ссылке в письме для подтверждения регистрации.";
         } else {
             return "Этот email уже используется. Введите корректный email."
@@ -75,18 +70,11 @@ public class AppUserServiceImpl implements AppUserService {
 
     }
 
-    private ResponseEntity<String> sendRequestToMailService(String cryptoUserId, String email) {
-        var restTemplate = new RestTemplate();
-        var headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+    private void sendRegistrationMail(String cryptoUserId, String email) {
         var mailParams = MailParams.builder()
                 .id(cryptoUserId)
                 .emailTo(email)
                 .build();
-        var request = new HttpEntity<>(mailParams, headers);
-        return restTemplate.exchange(mailServiceUri,
-                HttpMethod.POST,
-                request,
-                String.class);
+        rabbitTemplate.convertAndSend(registrationMailQueue, mailParams);
     }
 }
