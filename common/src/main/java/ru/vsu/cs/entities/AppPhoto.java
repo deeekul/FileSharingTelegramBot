@@ -1,12 +1,13 @@
 package ru.vsu.cs.entities;
 
 import lombok.*;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Getter
 @Setter
-@EqualsAndHashCode(exclude = "id")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,4 +25,17 @@ public class AppPhoto {
     private BinaryContent binaryContent;
 
     private Integer fileSize;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        AppPhoto appPhoto = (AppPhoto) o;
+        return telegramFileId != null && Objects.equals(telegramFileId, appPhoto.telegramFileId);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

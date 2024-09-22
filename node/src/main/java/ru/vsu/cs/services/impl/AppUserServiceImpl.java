@@ -50,7 +50,7 @@ public class AppUserServiceImpl implements AppUserService {
             var emailAddress = new InternetAddress(email);
             emailAddress.validate();
         } catch (AddressException e) {
-            return "Пожалуйста, введите корректный email. Для отмена команды нажмите /cancel";
+            return "Пожалуйста, введите корректный email. Для отмены команды нажмите /cancel";
         }
         var appUserOpt = appUserRepository.findByEmail(email);
         if (appUserOpt.isEmpty()) {
@@ -61,10 +61,10 @@ public class AppUserServiceImpl implements AppUserService {
             var cryptoUserId = hashids.encode(appUser.getId());
             sendRegistrationMail(cryptoUserId, email);
 
-            return "Вам на почту было отправлено письмо."
+            return "Вам на почту было отправлено письмо. "
                     + "Перейдите по ссылке в письме для подтверждения регистрации.";
         } else {
-            return "Этот email уже используется. Введите корректный email."
+            return "Этот email уже используется. Введите корректный email. "
                     + "Для отмены команды ведите /cancel";
         }
 
