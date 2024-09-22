@@ -2,6 +2,7 @@ package ru.vsu.cs.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
+import org.hashids.Hashids;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -9,7 +10,6 @@ import ru.vsu.cs.dto.MailParams;
 import ru.vsu.cs.entities.AppUser;
 import ru.vsu.cs.repositories.AppUserRepository;
 import ru.vsu.cs.services.AppUserService;
-import ru.vsu.cs.utils.CryptoTool;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -24,12 +24,12 @@ public class AppUserServiceImpl implements AppUserService {
 
     private final AppUserRepository appUserRepository;
 
-    private final CryptoTool cryptoTool;
-
-    private final RabbitTemplate rabbitTemplate;
+    private final Hashids hashids;
 
     @Value("${spring.rabbitmq.queues.registration-mail}")
     private String registrationMailQueue;
+
+    private final RabbitTemplate rabbitTemplate;
 
     @Override
     public String registerUser(AppUser appUser) {
@@ -58,7 +58,7 @@ public class AppUserServiceImpl implements AppUserService {
             appUser.setState(BASIC_STATE);
             appUser = appUserRepository.save(appUser);
 
-            var cryptoUserId = cryptoTool.hashOf(appUser.getId());
+            var cryptoUserId = hashids.encode(appUser.getId());
             sendRegistrationMail(cryptoUserId, email);
 
             return "Вам на почту было отправлено письмо."

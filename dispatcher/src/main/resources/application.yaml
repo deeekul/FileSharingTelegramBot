@@ -1,23 +1,21 @@
 server:
-  port: 8084
+  port: ${DISPATCHER_PORT:8084}
   ssl:
     enabled: false
 
+bot:
+  name: ${TG_BOT_NAME}
+  token: ${TG_BOT_TOKEN}
+  uri: ${TG_BOT_URI}
+
 spring:
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: deekul
-    password: p@ssw0rd
+    host: ${RABBIT_HOST:localhost}
+    port: ${RABBIT_PORT:5673}
+    username: ${RABBIT_USERNAME:deekul}
+    password: ${RABBIT_PASSWORD:p@ssw0rd}
     queues:
-      text-message-update: text_message_update
-      doc-message-update: doc_message_update
-      photo-message-update: photo_message_update
-      answer-message: answer_message
-
-bot:
-  name: fileshr_bot
-  token:
-  uri:
-
-
+      text-message-update: ${RABBIT_TEXT_MESSAGE_UPDATE_QUEUE}
+      doc-message-update: ${RABBIT_DOC_MESSAGE_UPDATE_QUEUE}
+      photo-message-update: ${RABBIT_PHOTO_MESSAGE_UPDATE_QUEUE}
+      answer-message: ${RABBIT_ANSWER_MESSAGE_QUEUE}

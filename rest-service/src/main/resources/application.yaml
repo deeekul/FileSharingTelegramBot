@@ -1,12 +1,11 @@
 server:
-  port: 8086
-
+  port: ${REST_SERVICE_PORT:8086}
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:9100/fileSharingDb
-    username: deekul
-    password: p@ssw0rd
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:9100/fileSharingDb}
+    username: ${POSTGRES_USERNAME:deekul}
+    password: ${POSTGRES_PASSWORD:p@ssw0rd}
   jpa:
     generate-ddl: true
 
-salt:
+salt: ${SALT:test}

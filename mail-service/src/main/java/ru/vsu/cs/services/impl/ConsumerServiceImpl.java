@@ -10,6 +10,7 @@ import ru.vsu.cs.services.MailSenderService;
 @RequiredArgsConstructor
 @Service
 public class ConsumerServiceImpl implements ConsumerService {
+
     private final MailSenderService mailSenderService;
 
     @Override

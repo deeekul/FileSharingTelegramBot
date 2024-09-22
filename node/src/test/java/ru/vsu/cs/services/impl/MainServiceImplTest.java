@@ -14,6 +14,7 @@ import java.util.Set;
 
 @SpringBootTest
 class MainServiceImplTest {
+
     @Autowired
     private RawDataRepository rawDataRepository;
 
