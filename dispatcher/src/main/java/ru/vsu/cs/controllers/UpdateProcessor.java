@@ -25,7 +25,7 @@ public class UpdateProcessor {
 
     private final RabbitConfiguration rabbitConfiguration;
 
-    public void registerBot(TelegramBot telegramBot) {
+    public void registerBot(TelegramBot telegramBot)  {
         this.telegramBot = telegramBot;
     }
 

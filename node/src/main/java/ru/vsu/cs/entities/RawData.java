@@ -18,6 +18,7 @@ import javax.persistence.*;
 @Table (name = "raw_data")
 @Entity
 public class RawData {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

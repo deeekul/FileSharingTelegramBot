@@ -2,6 +2,7 @@ package ru.vsu.cs.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
+import org.hashids.Hashids;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -19,7 +20,6 @@ import ru.vsu.cs.repositories.AppPhotoRepository;
 import ru.vsu.cs.repositories.BinaryContentRepository;
 import ru.vsu.cs.services.FileService;
 import ru.vsu.cs.services.enums.LinkType;
-import ru.vsu.cs.utils.CryptoTool;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,11 +37,15 @@ public class FileServiceImpl implements FileService {
     @Value("${token}")
     private String token;
 
-    /** The address where we can request information about the file from telegram */
+    /**
+     * The address where we can request information about the file from telegram
+     */
     @Value("${service.file_info.uri}")
     private String fileInfoUri;
 
-    /** The address where you can download the content */
+    /**
+     * The address where you can download the content
+     */
     @Value("${service.file_storage.uri}")
     private String fileStorageUri;
 
@@ -54,7 +58,7 @@ public class FileServiceImpl implements FileService {
 
     private final BinaryContentRepository binaryContentRepository;
 
-    private final CryptoTool cryptoTool;
+    private final Hashids hashids;
 
     @Override
     public AppDocument processDoc(Message telegramMessage) {
@@ -152,7 +156,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public String generateLink(Long docId, LinkType linkType) {
-        var hash = cryptoTool.hashOf(docId);
+        var hash = hashids.encode(docId);
         return "http://" + linkAddress + "/" + linkType + "?id=" + hash;
     }
 }

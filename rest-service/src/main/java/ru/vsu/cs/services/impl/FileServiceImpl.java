@@ -8,7 +8,7 @@ import ru.vsu.cs.entities.AppPhoto;
 import ru.vsu.cs.repositories.AppDocumentRepository;
 import ru.vsu.cs.repositories.AppPhotoRepository;
 import ru.vsu.cs.services.FileService;
-import ru.vsu.cs.utils.CryptoTool;
+import ru.vsu.cs.utils.Decoder;
 
 @Log4j
 @RequiredArgsConstructor
@@ -19,17 +19,17 @@ public class FileServiceImpl implements FileService {
 
     private final AppPhotoRepository appPhotoRepository;
 
-    private final CryptoTool cryptoTool;
+    private final Decoder decoder;
 
     @Override
     public AppDocument getDocument(String docId) {
-        var id = cryptoTool.idOf(docId);
+        var id = decoder.idOf(docId);
         return appDocumentRepository.findById(id).orElse(null);
     }
 
     @Override
     public AppPhoto getPhoto(String photoId) {
-        var id = cryptoTool.idOf(photoId);
+        var id = decoder.idOf(photoId);
         return appPhotoRepository.findById(id).orElse(null);
     }
 }
