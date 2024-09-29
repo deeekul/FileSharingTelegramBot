@@ -6,10 +6,10 @@ ENV_FILE="./.env"
 pushd ~/FileSharingTelegramBot/ || exit
 
 # Переходим на ветку develop
-git checkout develop
+git checkout main
 
 # Обновляем ветку develop
-git pull origin develop
+git pull origin main
 
 # Останавливаем старые контейнеры микросервисов и запускаем новые с обновлённым кодом
 docker compose -f docker-compose.yml --env-file $ENV_FILE down --timeout=60 --remove-orphans
