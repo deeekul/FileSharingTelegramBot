@@ -28,5 +28,5 @@ service:
     uri: ${TG_BOT_FILE_STORAGE_URI}
 
 link:
-  address: ${HOST_URL:localhost}:${REST_PORT:8086}
+  address: ${TG_BOT_URI:http://localhost:8086}
 salt: ${SALT:test}

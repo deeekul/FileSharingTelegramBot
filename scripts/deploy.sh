@@ -3,7 +3,7 @@
 ENV_FILE="./.env"
 
 # Обновление кода и деплой backend приложения
-pushd ~/Documents/work-projects/FileSharingBot/ || exit
+pushd ~/FileSharingTelegramBot/ || exit
 
 # Переходим на ветку develop
 git checkout develop
