@@ -14,13 +14,13 @@ import java.io.IOException;
 
 @Log4j
 @RequiredArgsConstructor
-@RequestMapping("/file")
+@RequestMapping("/api")
 @RestController
 public class FileController {
 
     private final FileService fileService;
 
-    @GetMapping("/get-doc")
+    @GetMapping("/file/get-doc")
     public void getDoc(@RequestParam("id") String id, HttpServletResponse response) {
         var document = fileService.getDocument(id);
         if (document == null) {
@@ -42,7 +42,7 @@ public class FileController {
         }
     }
 
-    @GetMapping("/get-photo")
+    @GetMapping("/file/get-photo")
     public void getPhoto(@RequestParam("id") String id, HttpServletResponse response) {
         var photo = fileService.getPhoto(id);
         if (photo == null) {

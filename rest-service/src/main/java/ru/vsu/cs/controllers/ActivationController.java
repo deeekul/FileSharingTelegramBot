@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.vsu.cs.services.UserActivationService;
 
 @RequiredArgsConstructor
-@RequestMapping("/user")
+@RequestMapping("/api")
 @RestController
 public class ActivationController {
 
     private final UserActivationService userActivationService;
 
-    @GetMapping("/activation")
+    @GetMapping("/user/activation")
     public ResponseEntity<?> activation(@RequestParam("id") String id) {
         var result = userActivationService.activation(id);
         if (result) {
