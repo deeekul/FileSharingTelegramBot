@@ -5,10 +5,10 @@ ENV_FILE="./.env"
 # Обновление кода и деплой backend приложения
 pushd ~/FileSharingTelegramBot/ || exit
 
-# Переходим на ветку develop
+# Переходим на ветку main
 git checkout main
 
-# Обновляем ветку develop
+# Обновляем ветку main
 git pull origin main
 
 # Останавливаем старые контейнеры микросервисов и запускаем новые с обновлённым кодом
