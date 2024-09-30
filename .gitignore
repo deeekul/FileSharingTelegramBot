@@ -10,6 +10,9 @@ target/
 *.iml
 *.ipr
 
+# Secret
+.env
+
 ### Eclipse ###
 .apt_generated
 .classpath
