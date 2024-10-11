@@ -9,6 +9,7 @@ training project to explore the possibilities of Telegram bots.
 - PostgreSQL
 - Docker
 - RabbitMQ
+- Maven
 
 ## Opportunities
 - User registration
